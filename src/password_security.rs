@@ -118,6 +118,8 @@ pub fn decrypt_str_or_original(s: &str, current_version: &str) -> (String, bool,
     if s.len() > VERSION_LEN {
         if s.starts_with("00") {
             if let Ok(v) = decrypt(s[VERSION_LEN..].as_bytes()) {
+                let r = String::from_utf8_lossy(&v).to_string();
+                dbg! ("decrypt_str_or_original: {}", &r);
                 return (
                     String::from_utf8_lossy(&v).to_string(),
                     true,
