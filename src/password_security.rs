@@ -133,6 +133,8 @@ pub fn decrypt_str_or_original(s: &str, current_version: &str) -> (String, bool,
 }
 
 pub fn encrypt_vec_or_original(v: &[u8], version: &str, max_len: usize) -> Vec<u8> {
+
+    dbg! ("encrypt vec!1");
     if decrypt_vec_or_original(v, version).1 {
         log::error!("Duplicate encryption!");
         return v.to_owned();
@@ -154,10 +156,12 @@ pub fn encrypt_vec_or_original(v: &[u8], version: &str, max_len: usize) -> Vec<u
 // bool: whether decryption is successful
 // bool: whether should store to re-encrypt when load
 pub fn decrypt_vec_or_original(v: &[u8], current_version: &str) -> (Vec<u8>, bool, bool) {
+    dbg! ("decrypt vec!1 {}", &v);
     if v.len() > VERSION_LEN {
         let version = String::from_utf8_lossy(&v[..VERSION_LEN]);
         if version == "00" {
             if let Ok(v) = decrypt(&v[VERSION_LEN..]) {
+                dbg! ("decrypted v: {}", &v);
                 return (v, true, version != current_version);
             }
         }
@@ -190,6 +194,7 @@ pub fn symmetric_crypt(data: &[u8], encrypt: bool) -> Result<Vec<u8>, ()> {
     keybuf.resize(secretbox::KEYBYTES, 0);
     let key = secretbox::Key(keybuf.try_into().map_err(|_| ())?);
     let nonce = secretbox::Nonce([0; secretbox::NONCEBYTES]);
+    dbg! ("symmcrypt: (encrypt: {}) nonce {}, key {}, data {}", encrypt, &nonce, &key, &data);
 
     if encrypt {
         Ok(secretbox::seal(data, &nonce, &key))

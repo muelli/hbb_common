@@ -1297,6 +1297,7 @@ impl PeerConfig {
                 let mut store = false;
                 let (password, _, store2) =
                     decrypt_vec_or_original(&config.password, PASSWORD_ENC_VERSION);
+                dbg! ("Load peerconfig {}: {}", id, &password);
                 config.password = password;
                 store = store || store2;
                 for opt in ["rdp_password", "os-username", "os-password"] {
@@ -1325,12 +1326,14 @@ impl PeerConfig {
     }
 
     pub fn store(&self, id: &str) {
+        dbg! ("config store: {}", id);
         let _lock = CONFIG.read().unwrap();
         self.store_(id);
     }
 
     fn store_(&self, id: &str) {
         let mut config = self.clone();
+        dbg! ("Storing! {}", &config.password);
         config.password =
             encrypt_vec_or_original(&config.password, PASSWORD_ENC_VERSION, ENCRYPT_MAX_LEN);
         for opt in ["rdp_password", "os-username", "os-password"] {
